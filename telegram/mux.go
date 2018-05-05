@@ -27,3 +27,10 @@ func (mux *Mux) Do(message tgbotapi.Message) {
         }
     }
 }
+
+func NewMux(api *tgbotapi.BotAPI) Mux {
+    mux := Mux{Api: api}
+    mux.keyAndHandle = make(map[string]func(*tgbotapi.BotAPI, tgbotapi.Message, string))
+
+    return mux
+}

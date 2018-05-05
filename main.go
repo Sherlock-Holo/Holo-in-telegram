@@ -18,7 +18,7 @@ func main() {
         log.Fatal(err)
     }
 
-    mux := telegram.Mux{Api: bot}
+    mux := telegram.NewMux(bot)
     mux.Add("google", google.Handle)
     mux.Add("arch", arch.Handle)
 
