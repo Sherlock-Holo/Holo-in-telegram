@@ -36,6 +36,6 @@ func main() {
             continue
         }
 
-        mux.Do(*update.Message)
+        go mux.Do(*update.Message)
     }
 }
