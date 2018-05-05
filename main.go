@@ -6,10 +6,13 @@ import (
     "github.com/Sherlock-Holo/Holo-in-telegram/telegram"
     "github.com/Sherlock-Holo/Holo-in-telegram/google"
     "github.com/Sherlock-Holo/Holo-in-telegram/arch"
+    "os"
 )
 
 func main() {
-    bot, err := tgbotapi.NewBotAPI("MyAwesomeBotToken")
+    token := os.Args[1]
+
+    bot, err := tgbotapi.NewBotAPI(token)
 
     if err != nil {
         log.Fatal(err)
