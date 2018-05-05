@@ -1,12 +1,12 @@
 package arch
 
 import (
-	"testing"
+    "testing"
     "fmt"
 )
 
 func TestQuery(t *testing.T) {
-	answer, err := Query("caddy", "")
+    answer, err := Query("linux", "")
 
     if err != nil {
         t.Error(err)

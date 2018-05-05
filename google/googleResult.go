@@ -1,4 +1,6 @@
-package result
+package google
+
+import "fmt"
 
 type Result struct {
     //Kind  string `json:"kind"`
@@ -16,4 +18,12 @@ type Answer struct {
     Title   string
     Snippet string
     Url     string
+}
+
+func (a Answer) String() string {
+    s := "Title: %s" + "\n" +
+        "Snippet: %s" + "\n" +
+        "url: %s"
+
+    return fmt.Sprintf(s, a.Title, a.Snippet, a.Url)
 }

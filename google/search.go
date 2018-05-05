@@ -1,4 +1,4 @@
-package result
+package google
 
 import (
     "net/http"
@@ -9,7 +9,10 @@ import (
 //const searchUrl = "https://www.googleapis.com/customsearch/v1?key=AIzaSyCn_IE6NM_ATjZ0j5vfXIFlyW-EpGs5gsU&cx=006431901905483214390:i3yxhoqkzo0&num=1&alt=json&q=%E6%94%AF%E4%BB%98%E5%AE%9D"
 const searchUrl = "https://www.googleapis.com/customsearch/v1?key=%s&cx=%s&num=1&alt=json&q=%s"
 
-func Search(key, cx, question string) (Answer, error) {
+func Search(question string) (Answer, error) {
+    key := "AIzaSyCn_IE6NM_ATjZ0j5vfXIFlyW-EpGs5gsU"
+    cx := "006431901905483214390:i3yxhoqkzo0"
+
     resp, err := http.Get(fmt.Sprintf(searchUrl, key, cx, question))
 
     if err != nil {

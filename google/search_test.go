@@ -1,4 +1,4 @@
-package result
+package google
 
 import (
 	"testing"
