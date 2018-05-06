@@ -7,12 +7,23 @@ import (
     "github.com/Sherlock-Holo/Holo-in-telegram/google"
     "github.com/Sherlock-Holo/Holo-in-telegram/arch"
     "os"
+    "flag"
+)
+
+var (
+    token = flag.String("token", "", "bot token")
+    debug = flag.Bool("debug", false, "debug mode")
 )
 
 func main() {
-    token := os.Args[1]
+    flag.Parse()
 
-    bot, err := tgbotapi.NewBotAPI(token)
+    if flag.NFlag() == 0 {
+        flag.Usage()
+        os.Exit(2)
+    }
+
+    bot, err := tgbotapi.NewBotAPI(*token)
 
     if err != nil {
         log.Fatal(err)
@@ -22,7 +33,7 @@ func main() {
     mux.Add("google", google.Handle)
     mux.Add("arch", arch.Handle)
 
-    bot.Debug = true
+    bot.Debug = *debug
 
     log.Printf("Authorized on account %s", bot.Self.UserName)
 
