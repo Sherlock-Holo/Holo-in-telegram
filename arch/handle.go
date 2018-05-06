@@ -11,6 +11,7 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
     if args == "" {
         helpReply := tgbotapi.NewMessage(message.Chat.ID, help)
         helpReply.ReplyToMessageID = message.MessageID
+        helpReply.ParseMode = tgbotapi.ModeMarkdown
         bot.Send(helpReply)
         return
     }
