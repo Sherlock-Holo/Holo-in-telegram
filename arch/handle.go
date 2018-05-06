@@ -5,7 +5,7 @@ import (
     "strings"
 )
 
-const help = "`/arch package [repo]`, repo: eg: `stable`, `testing` or `core`, `extra`"
+const help = "*/arch* `package [repo]` , repo: eg: `stable` , `testing` or `core` , `extra`"
 
 func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
     if args == "" {
@@ -43,6 +43,7 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
     }
 
     reply.ReplyToMessageID = message.MessageID
+    reply.ParseMode = tgbotapi.ModeMarkdown
 
     bot.Send(reply)
 }

@@ -14,12 +14,12 @@ type Answer struct {
 var EmptyResult = fmt.Errorf("empty results")
 
 func (a Answer) String() string {
-    s := "name: %s" + "\n" +
-        "description: %s" + "\n" +
-        "version: %s" + "\n" +
-        "rel: %d" + "\n" +
-        "repo: %s" + "\n" +
-        "url: %s"
+    s := "*name*: %s" + "\n" +
+        "*description*: %s" + "\n" +
+        "*version*: %s" + "\n" +
+        "*rel*: %d" + "\n" +
+        "*repo*: %s" + "\n" +
+        "*url*: %s"
 
     return fmt.Sprintf(s, a.Pkgname, a.Pkgdesc, a.Pkgver, a.Pkgrel, a.Repo, a.Url)
 }
