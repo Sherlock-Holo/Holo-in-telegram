@@ -17,11 +17,12 @@ func (mux *Mux) Add(key string, handle func(*tgbotapi.BotAPI, tgbotapi.Message, 
 func (mux *Mux) Do(message tgbotapi.Message) {
     text := message.Text
 
+    split := strings.Split(text, " ")
+    args := strings.Join(split[1:], " ")
+
     for key, handle := range mux.keyAndHandle {
         if strings.HasPrefix(text, key) {
-            split := strings.Split(text, " ")
 
-            args := strings.Join(split[1:], " ")
             handle(mux.Api, message, args)
             return
         }

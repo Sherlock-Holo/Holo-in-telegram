@@ -6,7 +6,6 @@ import (
     "encoding/json"
 )
 
-//const searchUrl = "https://www.googleapis.com/customsearch/v1?key=AIzaSyCn_IE6NM_ATjZ0j5vfXIFlyW-EpGs5gsU&cx=006431901905483214390:i3yxhoqkzo0&num=1&alt=json&q=%E6%94%AF%E4%BB%98%E5%AE%9D"
 const searchUrl = "https://www.googleapis.com/customsearch/v1"
 
 func Search(question string) (Answer, error) {
