@@ -2,7 +2,7 @@ package google
 
 import "github.com/go-telegram-bot-api/telegram-bot-api"
 
-const help = "*/google question*"
+const help = "*/google* `question`"
 
 func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
     if args == "" {
