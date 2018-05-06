@@ -3,6 +3,7 @@ package arch
 import (
     "github.com/go-telegram-bot-api/telegram-bot-api"
     "strings"
+    "log"
 )
 
 const help = "*/arch* `package [repo]` , repo: eg: `stable` , `testing` or `core` , `extra`"
@@ -37,6 +38,7 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
         reply = tgbotapi.NewMessage(message.Chat.ID, "no package")
 
     case err != nil:
+        log.Println(err)
         reply = tgbotapi.NewMessage(message.Chat.ID, "error")
 
     default:
