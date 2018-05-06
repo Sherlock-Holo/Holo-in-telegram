@@ -5,7 +5,16 @@ import (
     "strings"
 )
 
+const help = "`/arch package [repo]`, repo: eg: `stable`, `testing` or `core`, `extra`"
+
 func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
+    if args == "" {
+        helpReply := tgbotapi.NewMessage(message.Chat.ID, help)
+        helpReply.ReplyToMessageID = message.MessageID
+        bot.Send(helpReply)
+        return
+    }
+
     split := strings.Split(args, " ")
 
     var (
