@@ -11,7 +11,7 @@ type Answer struct {
     Url     string
 }
 
-var EmptyResult = fmt.Errorf("empty results")
+var EmptyResult = fmt.Errorf("empty result")
 
 func (a Answer) String() string {
     s := "*name*: %s" + "\n" +

@@ -1,6 +1,9 @@
 package google
 
-import "github.com/go-telegram-bot-api/telegram-bot-api"
+import (
+    "github.com/go-telegram-bot-api/telegram-bot-api"
+    "log"
+)
 
 const help = "*/google* `question`"
 
@@ -30,5 +33,7 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
     reply.ReplyToMessageID = message.MessageID
     reply.ParseMode = tgbotapi.ModeMarkdown
 
-    bot.Send(reply)
+    if _, err := bot.Send(reply); err != nil {
+        log.Println(err)
+    }
 }

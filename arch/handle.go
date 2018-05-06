@@ -35,11 +35,11 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
 
     switch {
     case err == EmptyResult:
-        reply = tgbotapi.NewMessage(message.Chat.ID, "no package")
+        reply = tgbotapi.NewMessage(message.Chat.ID, "*no package*")
 
     case err != nil:
         log.Println(err)
-        reply = tgbotapi.NewMessage(message.Chat.ID, "error")
+        reply = tgbotapi.NewMessage(message.Chat.ID, "*error*")
 
     default:
         reply = tgbotapi.NewMessage(message.Chat.ID, answer.String())
@@ -48,5 +48,7 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
     reply.ReplyToMessageID = message.MessageID
     reply.ParseMode = tgbotapi.ModeMarkdown
 
-    bot.Send(reply)
+    if _, err := bot.Send(reply); err != nil {
+        log.Println(err)
+    }
 }
