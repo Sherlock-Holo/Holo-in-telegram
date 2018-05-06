@@ -6,7 +6,7 @@ import (
 )
 
 type Mux struct {
-    Api          *tgbotapi.BotAPI
+    Bot          *tgbotapi.BotAPI
     keyAndHandle map[string]func(*tgbotapi.BotAPI, tgbotapi.Message, string)
 }
 
@@ -21,16 +21,16 @@ func (mux *Mux) Do(message tgbotapi.Message) {
     args := strings.Join(split[1:], " ")
 
     for key, handle := range mux.keyAndHandle {
-        if strings.HasPrefix(text, key) {
+        if strings.HasPrefix(text, key+" ") || strings.HasPrefix(text, key+"@"+mux.Bot.Self.UserName) {
 
-            handle(mux.Api, message, args)
+            handle(mux.Bot, message, args)
             return
         }
     }
 }
 
 func NewMux(api *tgbotapi.BotAPI) Mux {
-    mux := Mux{Api: api}
+    mux := Mux{Bot: api}
     mux.keyAndHandle = make(map[string]func(*tgbotapi.BotAPI, tgbotapi.Message, string))
 
     return mux
