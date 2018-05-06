@@ -46,7 +46,7 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
     }
 
     reply.ReplyToMessageID = message.MessageID
-    reply.ParseMode = tgbotapi.ModeMarkdown
+    //reply.ParseMode = tgbotapi.ModeMarkdown
 
     if _, err := bot.Send(reply); err != nil {
         log.Println(err)
