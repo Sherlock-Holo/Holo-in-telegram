@@ -33,5 +33,7 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
         reply = tgbotapi.NewMessage(message.Chat.ID, answer.String())
     }
 
+    reply.ReplyToMessageID = message.MessageID
+
     bot.Send(reply)
 }
