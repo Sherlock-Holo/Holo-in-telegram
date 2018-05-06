@@ -22,7 +22,6 @@ func (mux *Mux) Do(message tgbotapi.Message) {
 
     for key, handle := range mux.keyAndHandle {
         if strings.HasPrefix(text, key+" ") || strings.HasPrefix(text, key+"@"+mux.Bot.Self.UserName) {
-
             handle(mux.Bot, message, args)
             return
         }

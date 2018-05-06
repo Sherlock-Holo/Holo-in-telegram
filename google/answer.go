@@ -21,8 +21,8 @@ type Answer struct {
 }
 
 func (a Answer) String() string {
-    s := "Title: %s" + "\n" +
-        "Snippet: %s" + "\n" +
+    s := "Title: %s" + "\n\n" +
+        "Snippet: %s" + "\n\n" +
         "url: %s"
 
     return fmt.Sprintf(s, a.Title, a.Snippet, a.Url)
