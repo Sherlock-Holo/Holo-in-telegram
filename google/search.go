@@ -43,8 +43,7 @@ func Search(question string) (Answer, error) {
     }
 
     return Answer{
-        Title:   result.Items[0].Title,
-        Snippet: result.Items[0].Snippet,
-        Url:     result.Items[0].Link,
+        Title: result.Items[0].Title,
+        Url:   result.Items[0].Link,
     }, nil
 }
