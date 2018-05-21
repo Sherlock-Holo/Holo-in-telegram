@@ -6,11 +6,13 @@ import (
     "encoding/json"
 )
 
-const searchUrl = "https://www.googleapis.com/customsearch/v1"
+const (
+    searchUrl = "https://www.googleapis.com/customsearch/v1"
+    key       = "AIzaSyCn_IE6NM_ATjZ0j5vfXIFlyW-EpGs5gsU"
+    cx        = "010326660652388526533:m2s0xgark_u"
+)
 
 func Search(question string) (Answer, error) {
-    key := "AIzaSyCn_IE6NM_ATjZ0j5vfXIFlyW-EpGs5gsU"
-    cx := "006431901905483214390:i3yxhoqkzo0"
 
     request, err := http.NewRequest(http.MethodGet, searchUrl, nil)
 
