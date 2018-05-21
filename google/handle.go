@@ -1,8 +1,9 @@
 package google
 
 import (
-    "github.com/go-telegram-bot-api/telegram-bot-api"
     "log"
+
+    "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const help = "*/google* `question`"
@@ -23,6 +24,7 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
     )
 
     if err != nil {
+        log.Println(err)
         reply = tgbotapi.NewMessage(message.Chat.ID, "error")
         bot.Send(reply)
         return
