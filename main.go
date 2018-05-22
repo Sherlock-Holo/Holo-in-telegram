@@ -1,18 +1,21 @@
 package main
 
 import (
-    "github.com/go-telegram-bot-api/telegram-bot-api"
-    "log"
-    "github.com/Sherlock-Holo/Holo-in-telegram/telegram"
-    "github.com/Sherlock-Holo/Holo-in-telegram/google"
-    "github.com/Sherlock-Holo/Holo-in-telegram/arch"
-    "os"
     "flag"
+    "log"
+    "os"
+
+    "github.com/Sherlock-Holo/Holo-in-telegram/arch"
+    "github.com/Sherlock-Holo/Holo-in-telegram/google"
+    "github.com/Sherlock-Holo/Holo-in-telegram/telegram"
+    "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 var (
     token = flag.String("token", "", "bot token")
     debug = flag.Bool("debug", false, "debug mode")
+    key   = flag.String("key", "", "google api key")
+    cx    = flag.String("cx", "", "google api cx")
 )
 
 func main() {
@@ -28,6 +31,9 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
+
+    google.Key = *key
+    google.Cx = *cx
 
     mux := telegram.NewMux(bot)
     mux.Add("google", google.Handle)
