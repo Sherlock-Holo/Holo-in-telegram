@@ -1,16 +1,16 @@
 package arch
 
 import (
-    "testing"
-    "fmt"
+	"fmt"
+	"testing"
 )
 
 func TestQuery(t *testing.T) {
-    answer, err := Query("linux", "")
+	answer, err := Query("linux", "")
 
-    if err != nil {
-        t.Error(err)
-    }
+	if err != nil {
+		t.Error(err)
+	}
 
-    fmt.Println(answer)
+	fmt.Println(answer)
 }

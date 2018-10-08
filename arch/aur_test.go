@@ -1,20 +1,20 @@
 package arch
 
 import (
+	"fmt"
 	"testing"
-    "fmt"
 )
 
 func Test_aurQuery(t *testing.T) {
 	result, err := aurQuery("caddy")
 
-    if err == EmptyResult {
-        t.Log("empty")
-    }
+	if err == EmptyResult {
+		t.Log("empty")
+	}
 
-    if err != nil {
-        t.Error(err)
-    }
+	if err != nil {
+		t.Error(err)
+	}
 
-    fmt.Println(result)
+	fmt.Println(result)
 }

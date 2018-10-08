@@ -1,18 +1,18 @@
 package google
 
 import (
-    "fmt"
-    "testing"
+	"fmt"
+	"testing"
 )
 
 func TestSearch(t *testing.T) {
-    question := "夏娜和苦力怕不得不说的故事"
+	question := "夏娜和苦力怕不得不说的故事"
 
-    answer, err := Search(question)
+	answer, err := Search(question)
 
-    if err != nil {
-        t.Error(err)
-    }
+	if err != nil {
+		t.Error(err)
+	}
 
-    fmt.Println(answer)
+	fmt.Println(answer)
 }

@@ -1,87 +1,87 @@
 package arch
 
 import (
-    "strings"
-    "strconv"
-    "fmt"
+	"fmt"
+	"strconv"
+	"strings"
 )
 
 func Query(name, repo string) (Answer, error) {
-    if strings.ToLower(repo) == "aur" {
-        return aur(name)
+	if strings.ToLower(repo) == "aur" {
+		return aur(name)
 
-    } else {
-        answer, err := official(name, repo)
+	} else {
+		answer, err := official(name, repo)
 
-        if err != nil {
-            return aur(name)
-        }
+		if err != nil {
+			return aur(name)
+		}
 
-        return answer, nil
-    }
+		return answer, nil
+	}
 }
 
 func aur(name string) (Answer, error) {
-    result, err := aurQuery(name)
+	result, err := aurQuery(name)
 
-    if err != nil {
-        return Answer{}, err
-    }
+	if err != nil {
+		return Answer{}, err
+	}
 
-    list := strings.Split(result.Version, "-")
-    pkgrel, err := strconv.Atoi(list[len(list)-1])
+	list := strings.Split(result.Version, "-")
+	pkgrel, err := strconv.Atoi(list[len(list)-1])
 
-    if err != nil {
-        pkgrel = 1
-    }
+	if err != nil {
+		pkgrel = 1
+	}
 
-    return Answer{
-        Repo:    "AUR",
-        Pkgname: result.Name,
-        Pkgdesc: result.Desc,
-        Pkgver:  result.Version,
-        Pkgrel:  pkgrel,
-        Url:     result.Url,
-    }, nil
+	return Answer{
+		Repo:    "AUR",
+		Pkgname: result.Name,
+		Pkgdesc: result.Desc,
+		Pkgver:  result.Version,
+		Pkgrel:  pkgrel,
+		Url:     result.Url,
+	}, nil
 }
 
 func official(name, repo string) (Answer, error) {
-    var result officialResult
-    var err error
+	var result officialResult
+	var err error
 
-    switch strings.ToLower(repo) {
-    case "", "stable":
-        result, err = officialQuery(name, StableRepo...)
+	switch strings.ToLower(repo) {
+	case "", "stable":
+		result, err = officialQuery(name, StableRepo...)
 
-        if err != nil {
-            return Answer{}, err
-        }
+		if err != nil {
+			return Answer{}, err
+		}
 
-    case "testing":
-        result, err = officialQuery(name, TestingRepo...)
+	case "testing":
+		result, err = officialQuery(name, TestingRepo...)
 
-        if err != nil {
-            return Answer{}, err
-        }
+		if err != nil {
+			return Answer{}, err
+		}
 
-    default:
-        result, err = officialQuery(name, repo)
+	default:
+		result, err = officialQuery(name, repo)
 
-        if err != nil {
-            return Answer{}, err
-        }
-    }
+		if err != nil {
+			return Answer{}, err
+		}
+	}
 
-    pkgrel, _ := strconv.Atoi(result.Rel)
+	pkgrel, _ := strconv.Atoi(result.Rel)
 
-    url := fmt.Sprintf("https://www.archlinux.org/packages/%s/%s/%s", result.Repo, result.Arch, result.Name)
+	url := fmt.Sprintf("https://www.archlinux.org/packages/%s/%s/%s", result.Repo, result.Arch, result.Name)
 
-    return Answer{
-        Pkgname: result.Name,
-        Pkgdesc: result.Desc,
-        Pkgver:  result.Version,
-        Pkgrel:  pkgrel,
-        Repo:    result.Repo,
-        Url:     url,
-    }, nil
+	return Answer{
+		Pkgname: result.Name,
+		Pkgdesc: result.Desc,
+		Pkgver:  result.Version,
+		Pkgrel:  pkgrel,
+		Repo:    result.Repo,
+		Url:     url,
+	}, nil
 }
