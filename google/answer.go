@@ -7,7 +7,7 @@ import (
 )
 
 const answerTplString = `<strong>Title: </strong><b>{{.Title}}</b>
-<strong>URL: <strong>{{.Url}}
+<strong>URL: </strong>{{.Url}}
 `
 
 var answerTpl *template.Template
