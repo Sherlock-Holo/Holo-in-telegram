@@ -7,12 +7,12 @@ import (
 	"text/template"
 )
 
-const answerTplString = `<strong>name: </strong><b>{{.Pkgname}}</b>
-<strong>description: </strong><b>{{.Pkgdesc}}</b>
-<strong>version: </strong><b>{{.Pkgver}}</b>
-<strong>pkgrel: </strong><b>{{.Pkgrel}}</b>
-<strong>repo: </strong><b>{{.Repo}}</b>
-<strong>url: </strong><b>{{.Url}}</b>
+const answerTplString = `<strong>name: </strong>{{.Pkgname}}
+<strong>description: </strong>{{.Pkgdesc}}
+<strong>version: </strong>{{.Pkgver}}
+<strong>pkgrel: </strong>{{.Pkgrel}}
+<strong>repo: </strong>{{.Repo}}
+<strong>url: </strong>{{.Url}}
 `
 
 var answerTpl *template.Template
