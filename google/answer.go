@@ -6,7 +6,7 @@ import (
 	"text/template"
 )
 
-const answerTplString = `<strong>Title: </strong><b>{{.Title}}</b>
+const answerTplString = `<strong>Title: </strong>{{.Title}}
 <strong>URL: </strong>{{.Url}}
 `
 
