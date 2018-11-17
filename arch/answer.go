@@ -1,6 +1,25 @@
 package arch
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"strings"
+	"text/template"
+)
+
+const answerTplString = `<strong>name: </strong><b>Pkgname</b>
+<strong>description: </strong><b>Pkgdesc</b>
+<strong>version: </strong><b>Pkgver</b>
+<strong>pkgrel: </strong><b>Pkgrel</b>
+<strong>repo: </strong><b>Repo</b>
+<strong>url: </strong><b>Url</b>
+`
+
+var answerTpl *template.Template
+
+func init() {
+	answerTpl = template.Must(template.New("arch answer").Parse(answerTplString))
+}
 
 type Answer struct {
 	Pkgname string
@@ -14,19 +33,12 @@ type Answer struct {
 var EmptyResult = fmt.Errorf("empty result")
 
 func (a Answer) String() string {
-	/*s := "*name*: %s" + "\n" +
-	"*description*: %s" + "\n" +
-	"*version*: %s" + "\n" +
-	"*rel*: %d" + "\n" +
-	"*repo*: %s" + "\n" +
-	"*url*: %s"*/
+	builder := new(strings.Builder)
 
-	s := "name: %s" + "\n" +
-		"description: %s" + "\n" +
-		"version: %s" + "\n" +
-		"rel: %d" + "\n" +
-		"repo: %s" + "\n" +
-		"url: %s"
+	if err := answerTpl.Execute(builder, a); err != nil {
+		log.Println(err)
+		return ""
+	}
 
-	return fmt.Sprintf(s, a.Pkgname, a.Pkgdesc, a.Pkgver, a.Pkgrel, a.Repo, a.Url)
+	return builder.String()
 }

@@ -1,9 +1,10 @@
 package arch
 
 import (
-	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 	"strings"
+
+	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const help = "*/arch* `package [repo]` , repo: eg: `stable` , `testing` or `core` , `extra`"
@@ -42,11 +43,17 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
 		reply = tgbotapi.NewMessage(message.Chat.ID, "*error*")
 
 	default:
-		reply = tgbotapi.NewMessage(message.Chat.ID, answer.String())
+		answerStr := answer.String()
+		if answerStr != "" {
+			reply = tgbotapi.NewMessage(message.Chat.ID, answerStr)
+		} else {
+			log.Println("arch answer template execute failed")
+			return
+		}
 	}
 
 	reply.ReplyToMessageID = message.MessageID
-	// reply.ParseMode = tgbotapi.ModeMarkdown
+	reply.ParseMode = tgbotapi.ModeHTML
 
 	if _, err := bot.Send(reply); err != nil {
 		log.Println(err)

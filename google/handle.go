@@ -30,10 +30,16 @@ func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
 		return
 	}
 
-	reply = tgbotapi.NewMessage(message.Chat.ID, answer.String())
+	answerStr := answer.String()
+	if answerStr == "" {
+		log.Println("google answer template execute failed")
+		return
+	}
+
+	reply = tgbotapi.NewMessage(message.Chat.ID, answerStr)
 
 	reply.ReplyToMessageID = message.MessageID
-	reply.ParseMode = tgbotapi.ModeMarkdown
+	reply.ParseMode = tgbotapi.ModeHTML
 
 	if _, err := bot.Send(reply); err != nil {
 		log.Println(err)

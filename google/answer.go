@@ -1,6 +1,20 @@
 package google
 
-import "fmt"
+import (
+	"log"
+	"strings"
+	"text/template"
+)
+
+const answerTplString = `<strong>Title: </strong><b>{{.Title}}</b>
+<strong>URL: <strong>{{.Url}}
+`
+
+var answerTpl *template.Template
+
+func init() {
+	answerTpl = template.Must(template.New("google answer").Parse(answerTplString))
+}
 
 type Result struct {
 	Items []item `json:"items"`
@@ -18,8 +32,11 @@ type Answer struct {
 }
 
 func (a Answer) String() string {
-	s := "*Title*: %s" + "\n" +
-		"*Url*: %s"
+	builder := new(strings.Builder)
+	if err := answerTpl.Execute(builder, a); err != nil {
+		log.Println(err)
+		return ""
+	}
 
-	return fmt.Sprintf(s, a.Title, a.Url)
+	return builder.String()
 }
