@@ -10,27 +10,29 @@ func Query(name, repo string) (Answer, error) {
 	if strings.ToLower(repo) == "aur" {
 		return aur(name)
 
-	} else {
-		answer, err := official(name, repo)
-
-		if err != nil {
-			return aur(name)
-		}
-
-		return answer, nil
 	}
+
+	answer, err := official(name, repo)
+	switch err {
+	case EmptyResult:
+		return aur(name)
+	default:
+		return Answer{}, err
+
+	case nil:
+	}
+
+	return answer, nil
 }
 
 func aur(name string) (Answer, error) {
 	result, err := aurQuery(name)
-
 	if err != nil {
 		return Answer{}, err
 	}
 
 	list := strings.Split(result.Version, "-")
 	pkgrel, err := strconv.Atoi(list[len(list)-1])
-
 	if err != nil {
 		pkgrel = 1
 	}
@@ -52,21 +54,18 @@ func official(name, repo string) (Answer, error) {
 	switch strings.ToLower(repo) {
 	case "", "stable":
 		result, err = officialQuery(name, StableRepo...)
-
 		if err != nil {
 			return Answer{}, err
 		}
 
 	case "testing":
 		result, err = officialQuery(name, TestingRepo...)
-
 		if err != nil {
 			return Answer{}, err
 		}
 
 	default:
 		result, err = officialQuery(name, repo)
-
 		if err != nil {
 			return Answer{}, err
 		}

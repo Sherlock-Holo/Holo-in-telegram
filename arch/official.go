@@ -12,7 +12,6 @@ const (
 var (
 	StableRepo  = []string{"Core", "Extra", "Community", "Multilib"}
 	TestingRepo = []string{"Testing", "Community-Testing", "Multilib-Testing"}
-	archs       = []string{"any", "x86_64"}
 )
 
 type officialResult struct {
@@ -47,18 +46,12 @@ func officialQuery(name string, repos ...string) (officialResult, error) {
 	request.URL.RawQuery = query.Encode()
 
 	response, err := http.DefaultClient.Do(request)
-
 	if err != nil {
 		return officialResult{}, err
 	}
 
-	decoder := json.NewDecoder(response.Body)
-
-	result := OfficialResult{}
-
-	err = decoder.Decode(&result)
-
-	if err != nil {
+	var result OfficialResult
+	if err := json.NewDecoder(response.Body).Decode(&result); err != nil {
 		return officialResult{}, err
 	}
 

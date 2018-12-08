@@ -27,7 +27,6 @@ func main() {
 	}
 
 	bot, err := tgbotapi.NewBotAPI(*token)
-
 	if err != nil {
 		log.Fatal(err)
 	}
