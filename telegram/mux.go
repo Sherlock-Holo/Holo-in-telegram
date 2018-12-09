@@ -2,6 +2,7 @@ package telegram
 
 import (
 	"context"
+	"log"
 	"strings"
 
 	"github.com/go-telegram-bot-api/telegram-bot-api"
@@ -38,4 +39,19 @@ func NewMux(api *tgbotapi.BotAPI) Mux {
 	mux.ctx, mux.close = context.WithCancel(context.Background())
 
 	return mux
+}
+
+func (m *Mux) Run() {
+	go func() {
+		for msg := range m.ch {
+			if _, err := m.bot.Send(msg); err != nil {
+				log.Println(err)
+			}
+		}
+	}()
+}
+
+func (m *Mux) Close() error {
+	m.close()
+	return nil
 }
