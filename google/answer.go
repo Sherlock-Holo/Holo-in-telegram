@@ -1,6 +1,7 @@
 package google
 
 import (
+	"errors"
 	"log"
 	"strings"
 	"text/template"
@@ -11,6 +12,8 @@ const answerTplString = `<strong>Title: </strong>{{.Title}}
 `
 
 var answerTpl *template.Template
+
+var EmptyResult = errors.New("empty result")
 
 func init() {
 	answerTpl = template.Must(template.New("google answer").Parse(answerTplString))

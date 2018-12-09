@@ -1,47 +1,58 @@
 package google
 
 import (
+	"context"
 	"log"
+	"strings"
 
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 const help = "*/google* `question`"
 
-func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
-	if args == "" {
-		helpReply := tgbotapi.NewMessage(message.Chat.ID, help)
-		helpReply.ReplyToMessageID = message.MessageID
+type Google struct{}
+
+func (g *Google) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgbotapi.Chattable) {
+	args := strings.Split(msg.Text, " ")[1:]
+
+	if len(args) == 1 {
+		helpReply := tgbotapi.NewMessage(msg.Chat.ID, help)
+		helpReply.ReplyToMessageID = msg.MessageID
 		helpReply.ParseMode = tgbotapi.ModeMarkdown
-		bot.Send(helpReply)
+
+		select {
+		case <-ctx.Done():
+		case ch <- helpReply:
+		}
 		return
 	}
 
-	answer, err := Search(args)
+	var reply tgbotapi.MessageConfig
 
-	var (
-		reply tgbotapi.MessageConfig
-	)
-
-	if err != nil {
+	answer, err := Search(strings.Join(args[1:], " "))
+	switch err {
+	default:
 		log.Println(err)
-		reply = tgbotapi.NewMessage(message.Chat.ID, "error")
-		bot.Send(reply)
-		return
+		reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 犯迷糊了")
+
+	case EmptyResult:
+		reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 没有找到结果，并且不是 bot 吃了！！！")
+
+	case nil:
+		str := answer.String()
+		if str == "" {
+			reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 犯迷糊了")
+		} else {
+			log.Println("arch answer template execute failed")
+			reply = tgbotapi.NewMessage(msg.Chat.ID, str)
+		}
 	}
 
-	answerStr := answer.String()
-	if answerStr == "" {
-		log.Println("google answer template execute failed")
-		return
-	}
-
-	reply = tgbotapi.NewMessage(message.Chat.ID, answerStr)
-
-	reply.ReplyToMessageID = message.MessageID
+	reply.ReplyToMessageID = msg.MessageID
 	reply.ParseMode = tgbotapi.ModeHTML
 
-	if _, err := bot.Send(reply); err != nil {
-		log.Println(err)
+	select {
+	case <-ctx.Done():
+	case ch <- reply:
 	}
 }

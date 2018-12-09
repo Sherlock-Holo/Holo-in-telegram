@@ -2,7 +2,6 @@ package google
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -48,7 +47,7 @@ func Search(question string) (Answer, error) {
 	}
 
 	if len(result.Items) == 0 {
-		return Answer{}, fmt.Errorf("get 0 result")
+		return Answer{}, EmptyResult
 	}
 
 	return Answer{
