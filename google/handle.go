@@ -29,7 +29,7 @@ func (g *Google) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgb
 
 	var reply tgbotapi.MessageConfig
 
-	answer, err := Search(strings.Join(args[1:], " "))
+	answer, err := Search(strings.Join(args, " "))
 	switch err {
 	default:
 		log.Println(err)
