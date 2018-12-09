@@ -35,10 +35,10 @@ func (a *Arch) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgbot
 		switch err {
 		default:
 			log.Println(err)
-			reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个 AUR 包吃了")
+			reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，咱好像把这个 AUR 包吃了")
 
 		case EmptyResult:
-			reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 并没有找到这个 AUR 包，而且不是 bot 吃掉了！！！")
+			reply = tgbotapi.NewMessage(msg.Chat.ID, "咱并没有找到这个 AUR 包，而且不是咱吃掉了！！！")
 
 		case nil:
 			str := answer.String()
@@ -46,7 +46,7 @@ func (a *Arch) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgbot
 				reply = tgbotapi.NewMessage(msg.Chat.ID, str)
 			} else {
 				log.Println("arch answer template execute failed")
-				reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个 AUR 包吃了")
+				reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，咱好像把这个 AUR 包吃了")
 			}
 		}
 	} else {
@@ -55,7 +55,7 @@ func (a *Arch) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgbot
 		switch err {
 		default:
 			log.Println(err)
-			reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个包吃了")
+			reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，咱好像把这个包吃了")
 
 		case nil:
 			str := answer.String()
@@ -63,7 +63,7 @@ func (a *Arch) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgbot
 				reply = tgbotapi.NewMessage(msg.Chat.ID, str)
 			} else {
 				log.Println("arch answer template execute failed")
-				reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个包吃了")
+				reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，咱好像把这个包吃了")
 			}
 
 		case EmptyResult:
@@ -73,10 +73,10 @@ func (a *Arch) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgbot
 				switch err {
 				default:
 					log.Println(err)
-					reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个 AUR 包吃了")
+					reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，咱好像把这个 AUR 包吃了")
 
 				case EmptyResult:
-					reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 并没有找到这个 AUR 包，而且不是 bot 吃掉了！！！")
+					reply = tgbotapi.NewMessage(msg.Chat.ID, "咱并没有找到这个 AUR 包，而且不是咱吃掉了！！！")
 
 				case nil:
 					str := answer.String()
@@ -84,11 +84,11 @@ func (a *Arch) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgbot
 						reply = tgbotapi.NewMessage(msg.Chat.ID, str)
 					} else {
 						log.Println("arch answer template execute failed")
-						reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个 AUR 包吃了")
+						reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，咱好像把这个 AUR 包吃了")
 					}
 				}
 			} else {
-				reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 并没有找到这个包，而且不是 bot 吃掉了！！！")
+				reply = tgbotapi.NewMessage(msg.Chat.ID, "咱并没有找到这个包，而且不是咱吃掉了！！！")
 			}
 		}
 	}

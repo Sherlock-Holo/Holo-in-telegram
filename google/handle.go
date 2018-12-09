@@ -33,15 +33,15 @@ func (g *Google) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgb
 	switch err {
 	default:
 		log.Println(err)
-		reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 犯迷糊了")
+		reply = tgbotapi.NewMessage(msg.Chat.ID, "咱犯迷糊了")
 
 	case EmptyResult:
-		reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 没有找到结果，并且不是 bot 吃了！！！")
+		reply = tgbotapi.NewMessage(msg.Chat.ID, "咱没有找到结果，并且不是咱吃了！！！")
 
 	case nil:
 		str := answer.String()
 		if str == "" {
-			reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 犯迷糊了")
+			reply = tgbotapi.NewMessage(msg.Chat.ID, "咱犯迷糊了")
 		} else {
 			log.Println("arch answer template execute failed")
 			reply = tgbotapi.NewMessage(msg.Chat.ID, str)
