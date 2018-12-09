@@ -15,7 +15,7 @@ type Google struct{}
 func (g *Google) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgbotapi.Chattable) {
 	args := strings.Split(msg.Text, " ")[1:]
 
-	if len(args) == 1 {
+	if len(args) == 0 {
 		helpReply := tgbotapi.NewMessage(msg.Chat.ID, help)
 		helpReply.ReplyToMessageID = msg.MessageID
 		helpReply.ParseMode = tgbotapi.ModeMarkdown
