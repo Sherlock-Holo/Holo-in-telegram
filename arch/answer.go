@@ -1,7 +1,7 @@
 package arch
 
 import (
-	"fmt"
+	"errors"
 	"log"
 	"strings"
 	"text/template"
@@ -30,7 +30,7 @@ type Answer struct {
 	Url     string
 }
 
-var EmptyResult = fmt.Errorf("empty result")
+var EmptyResult = errors.New("empty result")
 
 func (a Answer) String() string {
 	builder := new(strings.Builder)

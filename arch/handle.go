@@ -1,61 +1,103 @@
 package arch
 
 import (
+	"context"
 	"log"
 	"strings"
 
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-const help = "*/arch* `package [repo]` , repo: eg: `stable` , `testing` or `core` , `extra`"
+const help = "*/arch* `package [repo]` , repo: eg: `stable` , `testing`, `aur` or `core` , `extra`"
 
-func Handle(bot *tgbotapi.BotAPI, message tgbotapi.Message, args string) {
-	if args == "" {
-		helpReply := tgbotapi.NewMessage(message.Chat.ID, help)
-		helpReply.ReplyToMessageID = message.MessageID
+type Arch struct{}
+
+func (a *Arch) Handle(msg tgbotapi.Message, ctx context.Context, ch chan<- tgbotapi.Chattable) {
+	args := strings.Split(msg.Text, " ")[1:]
+
+	if len(args) == 0 {
+		helpReply := tgbotapi.NewMessage(msg.Chat.ID, help)
+		helpReply.ReplyToMessageID = msg.MessageID
 		helpReply.ParseMode = tgbotapi.ModeMarkdown
-		bot.Send(helpReply)
+
+		select {
+		case <-ctx.Done():
+		case ch <- helpReply:
+		}
 		return
 	}
 
-	split := strings.Split(args, " ")
+	var reply tgbotapi.MessageConfig
 
-	var (
-		answer Answer
-		err    error
-		reply  tgbotapi.MessageConfig
-	)
+	if len(args) == 2 && strings.ToLower(args[1]) == "aur" {
+		answer, err := aurQuery(args[0])
 
-	switch len(split) {
-	case 1:
-		answer, err = Query(args, "")
+		switch err {
+		default:
+			log.Println(err)
+			reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个 AUR 包吃了")
 
-	case 2:
-		answer, err = Query(split[0], split[1])
-	}
+		case EmptyResult:
+			reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 并没有找到这个 AUR 包，而且不是 bot 吃掉了！！！")
 
-	switch {
-	case err == EmptyResult:
-		reply = tgbotapi.NewMessage(message.Chat.ID, "*no package*")
+		case nil:
+			str := answer.String()
+			if str != "" {
+				reply = tgbotapi.NewMessage(msg.Chat.ID, str)
+			} else {
+				log.Println("arch answer template execute failed")
+				reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个 AUR 包吃了")
+			}
+		}
+	} else {
+		answer, err := officialQuery(args[0], args[1:]...)
 
-	case err != nil:
-		log.Println(err)
-		reply = tgbotapi.NewMessage(message.Chat.ID, "*error*")
+		switch err {
+		default:
+			log.Println(err)
+			reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个包吃了")
 
-	default:
-		answerStr := answer.String()
-		if answerStr != "" {
-			reply = tgbotapi.NewMessage(message.Chat.ID, answerStr)
-		} else {
-			log.Println("arch answer template execute failed")
-			return
+		case nil:
+			str := answer.String()
+			if str != "" {
+				reply = tgbotapi.NewMessage(msg.Chat.ID, str)
+			} else {
+				log.Println("arch answer template execute failed")
+				reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个包吃了")
+			}
+
+		case EmptyResult:
+			if len(args[1:]) == 0 {
+				answer, err := aurQuery(args[0])
+
+				switch err {
+				default:
+					log.Println(err)
+					reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个 AUR 包吃了")
+
+				case EmptyResult:
+					reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 并没有找到这个 AUR 包，而且不是 bot 吃掉了！！！")
+
+				case nil:
+					str := answer.String()
+					if str != "" {
+						reply = tgbotapi.NewMessage(msg.Chat.ID, str)
+					} else {
+						log.Println("arch answer template execute failed")
+						reply = tgbotapi.NewMessage(msg.Chat.ID, "哎呀，bot 好像把这个 AUR 包吃了")
+					}
+				}
+			} else {
+				reply = tgbotapi.NewMessage(msg.Chat.ID, "bot 并没有找到这个包，而且不是 bot 吃掉了！！！")
+			}
 		}
 	}
 
-	reply.ReplyToMessageID = message.MessageID
+	reply.ReplyToMessageID = msg.MessageID
 	reply.ParseMode = tgbotapi.ModeHTML
 
-	if _, err := bot.Send(reply); err != nil {
-		log.Println(err)
+	select {
+	case <-ctx.Done():
+	case ch <- reply:
 	}
 }
