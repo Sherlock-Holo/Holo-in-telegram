@@ -7,7 +7,8 @@ import (
 	"text/template"
 )
 
-const answerTplString = `<strong>name: </strong>{{.Pkgname}}
+const (
+	officialAnswerTplString = `<strong>name: </strong>{{.Pkgname}}
 <strong>description: </strong>{{.Pkgdesc}}
 <strong>version: </strong>{{.Pkgver}}
 <strong>pkgrel: </strong>{{.Pkgrel}}
@@ -15,13 +16,27 @@ const answerTplString = `<strong>name: </strong>{{.Pkgname}}
 <strong>url: </strong>{{.Url}}
 `
 
-var answerTpl *template.Template
+	aurAnswerTplString = `<strong>name: </strong>{{.Pkgname}}
+<strong>description: </strong>{{.Pkgdesc}}
+<strong>version: </strong>{{.Pkgver}}
+<strong>pkgrel: </strong>{{.Pkgrel}}
+<strong>repo: </strong>{{.Repo}}
+<strong>url: </strong>{{.Url}}
+<strong>AUR: </strong>{{.AUR}}
+`
+)
+
+var (
+	officialAnswerTpl *template.Template
+	aurAnswerTpl      *template.Template
+)
 
 func init() {
-	answerTpl = template.Must(template.New("arch answer").Parse(answerTplString))
+	officialAnswerTpl = template.Must(template.New("arch answer").Parse(officialAnswerTplString))
+	aurAnswerTpl = template.Must(template.New("aur answer").Parse(aurAnswerTplString))
 }
 
-type Answer struct {
+type OfficialAnswer struct {
 	Pkgname string
 	Pkgdesc string
 	Pkgver  string
@@ -30,12 +45,28 @@ type Answer struct {
 	Url     string
 }
 
+type AURAnswer struct {
+	OfficialAnswer
+	AUR string
+}
+
 var EmptyResult = errors.New("empty result")
 
-func (a Answer) String() string {
+func (a OfficialAnswer) String() string {
 	builder := new(strings.Builder)
 
-	if err := answerTpl.Execute(builder, a); err != nil {
+	if err := officialAnswerTpl.Execute(builder, a); err != nil {
+		log.Println(err)
+		return ""
+	}
+
+	return builder.String()
+}
+
+func (a AURAnswer) String() string {
+	builder := new(strings.Builder)
+
+	if err := aurAnswerTpl.Execute(builder, a); err != nil {
 		log.Println(err)
 		return ""
 	}

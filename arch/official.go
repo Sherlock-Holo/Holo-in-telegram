@@ -31,11 +31,11 @@ type OfficialResult struct {
 	Results []officialResult `json:"results"`
 }
 
-func officialQuery(name string, repos ...string) (Answer, error) {
+func officialQuery(name string, repos ...string) (OfficialAnswer, error) {
 	request, err := http.NewRequest(http.MethodGet, officialUrl, nil)
 
 	if err != nil {
-		return Answer{}, err
+		return OfficialAnswer{}, err
 	}
 
 	query := request.URL.Query()
@@ -64,16 +64,16 @@ func officialQuery(name string, repos ...string) (Answer, error) {
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return Answer{}, err
+		return OfficialAnswer{}, err
 	}
 
 	var result OfficialResult
 	if err := json.NewDecoder(response.Body).Decode(&result); err != nil {
-		return Answer{}, err
+		return OfficialAnswer{}, err
 	}
 
 	if len(result.Results) == 0 {
-		return Answer{}, EmptyResult
+		return OfficialAnswer{}, EmptyResult
 	}
 
 	res := result.Results[0]
@@ -83,7 +83,7 @@ func officialQuery(name string, repos ...string) (Answer, error) {
 		pkgrel = 1
 	}
 
-	return Answer{
+	return OfficialAnswer{
 		Pkgname: res.Name,
 		Pkgdesc: res.Desc,
 		Pkgver:  res.Version,

@@ -21,10 +21,10 @@ type AurResult struct {
 	Results []aurResult `json:"results"`
 }
 
-func aurQuery(name string) (Answer, error) {
+func aurQuery(name string) (AURAnswer, error) {
 	request, err := http.NewRequest(http.MethodGet, aurUrl, nil)
 	if err != nil {
-		return Answer{}, err
+		return AURAnswer{}, err
 	}
 
 	query := request.URL.Query()
@@ -35,16 +35,16 @@ func aurQuery(name string) (Answer, error) {
 
 	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		return Answer{}, err
+		return AURAnswer{}, err
 	}
 
 	var result AurResult
 	if err := json.NewDecoder(response.Body).Decode(&result); err != nil {
-		return Answer{}, err
+		return AURAnswer{}, err
 	}
 
 	if result.Count == 0 {
-		return Answer{}, EmptyResult
+		return AURAnswer{}, EmptyResult
 	}
 
 	res := result.Results[0]
@@ -56,12 +56,15 @@ func aurQuery(name string) (Answer, error) {
 		pkgrel = 1
 	}
 
-	return Answer{
-		Repo:    "AUR",
-		Pkgname: res.Name,
-		Pkgdesc: res.Desc,
-		Pkgver:  res.Version,
-		Pkgrel:  pkgrel,
-		Url:     res.Url,
+	return AURAnswer{
+		OfficialAnswer: OfficialAnswer{
+			Repo:    "AUR",
+			Pkgname: res.Name,
+			Pkgdesc: res.Desc,
+			Pkgver:  res.Version,
+			Pkgrel:  pkgrel,
+			Url:     res.Url,
+		},
+		AUR: "https://aur.archlinux.org/packages/" + res.Name,
 	}, nil
 }
