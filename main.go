@@ -59,16 +59,16 @@ func main() {
 	signal.Notify(signalCh, os.Interrupt)
 
 	go func() {
-		<-signalCh
-		bot.StopReceivingUpdates()
-		_ = mux.Close()
+		for update := range updates {
+			if update.Message == nil {
+				continue
+			}
+
+			go mux.Do(*update.Message)
+		}
 	}()
 
-	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-
-		go mux.Do(*update.Message)
-	}
+	<-signalCh
+	bot.StopReceivingUpdates()
+	_ = mux.Close()
 }
