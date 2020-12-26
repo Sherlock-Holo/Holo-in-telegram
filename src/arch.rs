@@ -48,7 +48,7 @@ pub struct OfficialResult {
 impl Display for OfficialResult {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         if self.results.is_empty() {
-            return f.write_str("哎呀，咱好像把这个包吃了");
+            return f.write_str("哎呀，咱好像把这个包吃了~");
         }
 
         let result = &self.results[0];
