@@ -135,7 +135,7 @@ pub struct AurResultInfo {
     version: String,
 
     #[serde(rename = "URL")]
-    url: String,
+    url: Option<String>,
 
     #[serde(skip)]
     rel: usize,
@@ -173,7 +173,13 @@ impl Display for AurResult {
 <strong>url: </strong>{}
 <strong>AUR: </strong>{}
 "#,
-            result.name, result.desc, result.version, pkgrel, "AUR", result.url, aur_url
+            result.name,
+            result.desc,
+            result.version,
+            pkgrel,
+            "AUR",
+            result.url.as_deref().unwrap_or(""),
+            aur_url
         );
 
         f.write_str(&answer)
@@ -205,12 +211,23 @@ pub async fn aur_query(name: &str) -> Result<AurResult, Error> {
     url.query_pairs_mut()
         .extend_pairs(&[("v", "5"), ("type", "search"), ("arg", name)]);
 
-    let mut result = client
+    /*let mut result = client
+    .request(Method::GET, url)
+    .send()
+    .await?
+    .json::<AurResult>()
+    .await?;*/
+
+    let bytes = client
         .request(Method::GET, url)
         .send()
         .await?
-        .json::<AurResult>()
+        .bytes()
         .await?;
+
+    println!("{}", String::from_utf8_lossy(&bytes));
+
+    let mut result = serde_json::from_slice::<AurResult>(&bytes).unwrap();
 
     result.optimize_result(name);
 
