@@ -79,9 +79,14 @@ impl OfficialResult {
             let first_ratio = SequenceMatcher::new(name, &first.name).ratio();
             let second_ratio = SequenceMatcher::new(name, &second.name).ratio();
 
-            first_ratio
+            match first_ratio
                 .partial_cmp(&second_ratio)
                 .unwrap_or(Ordering::Equal)
+            {
+                Ordering::Greater => Ordering::Less,
+                Ordering::Less => Ordering::Greater,
+                Ordering::Equal => Ordering::Equal,
+            }
         })
     }
 
@@ -192,9 +197,14 @@ impl AurResult {
             let first_ratio = SequenceMatcher::new(name, &first.name).ratio();
             let second_ratio = SequenceMatcher::new(name, &second.name).ratio();
 
-            first_ratio
+            match first_ratio
                 .partial_cmp(&second_ratio)
                 .unwrap_or(Ordering::Equal)
+            {
+                Ordering::Greater => Ordering::Less,
+                Ordering::Less => Ordering::Greater,
+                Ordering::Equal => Ordering::Equal,
+            }
         })
     }
 
@@ -211,23 +221,12 @@ pub async fn aur_query(name: &str) -> Result<AurResult, Error> {
     url.query_pairs_mut()
         .extend_pairs(&[("v", "5"), ("type", "search"), ("arg", name)]);
 
-    /*let mut result = client
-    .request(Method::GET, url)
-    .send()
-    .await?
-    .json::<AurResult>()
-    .await?;*/
-
-    let bytes = client
+    let mut result = client
         .request(Method::GET, url)
         .send()
         .await?
-        .bytes()
+        .json::<AurResult>()
         .await?;
-
-    println!("{}", String::from_utf8_lossy(&bytes));
-
-    let mut result = serde_json::from_slice::<AurResult>(&bytes).unwrap();
 
     result.optimize_result(name);
 
