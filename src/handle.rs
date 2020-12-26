@@ -4,7 +4,6 @@ use std::lazy::SyncOnceCell;
 use teloxide::prelude::UpdateWithCx;
 use teloxide::requests::{Request, ResponseResult};
 use teloxide::types::{Message, ParseMode};
-use teloxide::RequestError;
 
 use crate::arch;
 use crate::command::Command;
@@ -29,8 +28,8 @@ pub async fn handle(cx: UpdateWithCx<Message>, cmd: Command) -> ResponseResult<(
             if let Some((google_key, google_cx)) = google_key_and_cx {
                 google::search(&question, google_key, google_cx)
                     .await
-                    .map_err(RequestError::NetworkError)?
-                    .to_string()
+                    .map(|result| result.to_string())
+                    .unwrap_or_else(|_| "哎呀咱好像在 Google 数据中心中迷路了~".to_string())
             } else {
                 return Ok(());
             }
@@ -50,26 +49,33 @@ pub async fn handle(cx: UpdateWithCx<Message>, cmd: Command) -> ResponseResult<(
             if repos.contains(&"aur") || repos.contains(&"AUR") {
                 arch::aur_query(&name)
                     .await
-                    .map_err(RequestError::NetworkError)?
-                    .to_string()
-            } else {
-                let result = arch::official_query(&name, &repos)
-                    .await
-                    .map_err(RequestError::NetworkError)?;
+                    .map(|result| result.to_string())
+                    .unwrap_or_else(|err| {
+                        log::error!("{}", err);
 
+                        "哎呀咱好像在 AUR 数据库中迷路了~".to_string()
+                    })
+            } else if let Ok(result) = arch::official_query(&name, &repos).await {
                 if !result.is_empty() {
                     result.to_string()
                 } else {
-                    let result = arch::aur_query(&name)
+                    arch::aur_query(&name)
                         .await
-                        .map_err(RequestError::NetworkError)?;
+                        .map(|result| {
+                            if result.is_empty() {
+                                "咱没有找到结果，并且不是咱吃了！！！".to_string()
+                            } else {
+                                result.to_string()
+                            }
+                        })
+                        .unwrap_or_else(|err| {
+                            log::error!("{}", err);
 
-                    if result.is_empty() {
-                        "咱没有找到结果，并且不是咱吃了！！！".to_string()
-                    } else {
-                        result.to_string()
-                    }
+                            "哎呀咱好像在 AUR 数据库中迷路了~".to_string()
+                        })
                 }
+            } else {
+                "哎呀咱好像在 Archlinux 数据库中迷路了~".to_string()
             }
         }
     };

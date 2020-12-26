@@ -5,8 +5,8 @@ use std::lazy::SyncOnceCell;
 
 use difflib::sequencematcher::SequenceMatcher;
 use reqwest::{Client, Error, Method, Url};
-use serde::Deserialize;
 use serde::export::Formatter;
+use serde::Deserialize;
 
 const OFFICIAL_URL: &str = "https://www.archlinux.org/packages/search/json";
 const AUR_URL: &str = "https://aur.archlinux.org/rpc/";
