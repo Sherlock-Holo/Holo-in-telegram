@@ -5,8 +5,8 @@ use std::lazy::SyncOnceCell;
 
 use difflib::sequencematcher::SequenceMatcher;
 use reqwest::{Client, Error, Method, Url};
-use serde::export::Formatter;
 use serde::Deserialize;
+use serde::export::Formatter;
 
 const OFFICIAL_URL: &str = "https://www.archlinux.org/packages/search/json";
 const AUR_URL: &str = "https://aur.archlinux.org/rpc/";
@@ -125,11 +125,13 @@ pub async fn official_query(name: &str, repos: &[&str]) -> Result<OfficialResult
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct AurResultInfo {
+    #[serde(rename = "Name")]
     name: String,
 
     #[serde(rename = "Description")]
     desc: String,
 
+    #[serde(rename = "Version")]
     version: String,
 
     #[serde(rename = "URL")]
@@ -141,7 +143,9 @@ pub struct AurResultInfo {
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct AurResult {
+    #[serde(rename = "resultcount")]
     count: usize,
+
     results: Vec<AurResultInfo>,
 }
 
