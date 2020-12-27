@@ -3,10 +3,11 @@ use std::fmt;
 use std::fmt::Display;
 use std::lazy::SyncOnceCell;
 
+use chrono::{DateTime, FixedOffset, NaiveDateTime};
 use difflib::sequencematcher::SequenceMatcher;
 use reqwest::{Client, Error, Method, Url};
-use serde::export::Formatter;
 use serde::Deserialize;
+use serde::export::Formatter;
 
 const OFFICIAL_URL: &str = "https://www.archlinux.org/packages/search/json";
 const AUR_URL: &str = "https://aur.archlinux.org/rpc/";
@@ -143,7 +144,16 @@ pub struct AurResultInfo {
     url: Option<String>,
 
     #[serde(skip)]
-    rel: usize,
+    rel: u32,
+
+    #[serde(rename = "NumVotes")]
+    vote: u32,
+
+    #[serde(rename = "OutOfDate")]
+    out_of_date: Option<i64>,
+
+    #[serde(rename = "Maintainer")]
+    maintainer: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -169,6 +179,17 @@ impl Display for AurResult {
 
         let aur_url = "https://aur.archlinux.org/packages/".to_string() + &result.name;
 
+        let cst = FixedOffset::east(8 * 3600);
+
+        let out_of_date = result
+            .out_of_date
+            .map(|date| {
+                DateTime::<FixedOffset>::from_utc(NaiveDateTime::from_timestamp(date, 0), cst)
+                    .format("%F")
+                    .to_string()
+            })
+            .unwrap_or_else(|| "no".to_string());
+
         let answer = format!(
             r#"<strong>name: </strong>{}
 <strong>description: </strong>{}
@@ -176,6 +197,9 @@ impl Display for AurResult {
 <strong>pkgrel: </strong>{}
 <strong>repo: </strong>{}
 <strong>url: </strong>{}
+<strong>vote: </strong>{}
+<strong>out-of-date: </strong>{}
+<strong>maintainer: </strong>{}
 <strong>AUR: </strong>{}
 "#,
             result.name,
@@ -184,6 +208,9 @@ impl Display for AurResult {
             pkgrel,
             "AUR",
             result.url.as_deref().unwrap_or(""),
+            result.vote,
+            out_of_date,
+            result.maintainer.as_deref().unwrap_or(""),
             aur_url
         );
 
