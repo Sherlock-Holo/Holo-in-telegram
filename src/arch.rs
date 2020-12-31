@@ -172,10 +172,12 @@ impl Display for AurResult {
 
         let result = &self.results[0];
 
-        let pkgrel = match result.version.split('-').last() {
-            None => 1,
-            Some(pkgrel) => pkgrel.parse().unwrap_or(1),
-        };
+        let pkgrel = result
+            .version
+            .split('-')
+            .last()
+            .map(|pkgrel| pkgrel.parse().unwrap_or(1))
+            .unwrap_or(1);
 
         let aur_url = "https://aur.archlinux.org/packages/".to_string() + &result.name;
 

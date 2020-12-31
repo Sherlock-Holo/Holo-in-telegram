@@ -1,7 +1,7 @@
 use teloxide::utils::command::{BotCommand, ParseError};
 
 #[derive(BotCommand, PartialEq, Debug, Eq, Clone)]
-#[command(rename = "lowercase", parse_with = "split")]
+#[command(rename = "lowercase")]
 pub enum Command {
     #[command(
     description = "*/arch* `package [repo]`, repo: eg: `stable` , `testing`, `aur` or `core` , `extra`",
@@ -62,9 +62,9 @@ mod tests {
 
     #[test]
     fn parse_google() {
-        let cmd: Command = Command::parse("/google linux", "").unwrap();
+        let cmd: Command = Command::parse("/google linux zen", "").unwrap();
 
-        assert_eq!(cmd, Command::Google("linux".to_string()));
+        assert_eq!(cmd, Command::Google("linux zen".to_string()));
     }
 
     #[test]
