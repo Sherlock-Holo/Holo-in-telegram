@@ -1,13 +1,13 @@
 use std::cmp::Ordering;
 use std::fmt;
-use std::fmt::Display;
-use std::lazy::SyncOnceCell;
+use std::fmt::{Display, Formatter};
+use std::sync::LazyLock;
 
 use chrono::{DateTime, FixedOffset, NaiveDateTime};
 use difflib::sequencematcher::SequenceMatcher;
 use reqwest::{Client, Error, Method, Url};
 use serde::Deserialize;
-use serde::export::Formatter;
+use tracing::instrument;
 
 const OFFICIAL_URL: &str = "https://www.archlinux.org/packages/search/json";
 const AUR_URL: &str = "https://aur.archlinux.org/rpc/";
@@ -15,7 +15,7 @@ const AUR_URL: &str = "https://aur.archlinux.org/rpc/";
 const STABLE_REPOS: [&str; 4] = ["Core", "Extra", "Community", "Multilib"];
 const TESTING_REPOS: [&str; 3] = ["Testing", "Community-Testing", "Multilib-Testing"];
 
-static CLIENT: SyncOnceCell<Client> = SyncOnceCell::new();
+static CLIENT: LazyLock<Client> = LazyLock::new(|| Client::builder().gzip(true).build().unwrap());
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct OfficialResultInfo {
@@ -25,9 +25,8 @@ pub struct OfficialResultInfo {
     #[serde(rename = "pkgdesc")]
     desc: String,
 
-    #[serde(rename = "licenses")]
-    licenses: Vec<String>,
-
+    /*#[serde(rename = "licenses")]
+    licenses: Vec<String>,*/
     #[serde(rename = "pkgver")]
     version: String,
 
@@ -75,6 +74,7 @@ impl Display for OfficialResult {
 }
 
 impl OfficialResult {
+    #[instrument]
     pub fn optimize_result(&mut self, name: &str) {
         self.results.sort_by(|first, second| {
             let first_ratio = SequenceMatcher::new(name, &first.name).ratio();
@@ -96,9 +96,8 @@ impl OfficialResult {
     }
 }
 
+#[instrument(err)]
 pub async fn official_query(name: &str, repos: &[&str]) -> Result<OfficialResult, Error> {
-    let client = CLIENT.get_or_init(|| reqwest::Client::builder().gzip(true).build().unwrap());
-
     let mut url: Url = OFFICIAL_URL.parse().unwrap();
 
     let repos = match repos.len() {
@@ -117,7 +116,7 @@ pub async fn official_query(name: &str, repos: &[&str]) -> Result<OfficialResult
         .append_pair("name", name)
         .extend_pairs(repos.iter().map(|repo| ("repo", repo)));
 
-    let mut result = client
+    let mut result = CLIENT
         .request(Method::GET, url)
         .send()
         .await?
@@ -143,9 +142,8 @@ pub struct AurResultInfo {
     #[serde(rename = "URL")]
     url: Option<String>,
 
-    #[serde(skip)]
-    rel: u32,
-
+    /*#[serde(skip)]
+    rel: u32,*/
     #[serde(rename = "NumVotes")]
     vote: u32,
 
@@ -158,9 +156,8 @@ pub struct AurResultInfo {
 
 #[derive(Deserialize, Debug, Clone)]
 pub struct AurResult {
-    #[serde(rename = "resultcount")]
-    count: usize,
-
+    /*#[serde(rename = "resultcount")]
+    count: usize,*/
     results: Vec<AurResultInfo>,
 }
 
@@ -181,14 +178,17 @@ impl Display for AurResult {
 
         let aur_url = "https://aur.archlinux.org/packages/".to_string() + &result.name;
 
-        let cst = FixedOffset::east(8 * 3600);
+        let cst = FixedOffset::east_opt(8 * 3600).unwrap();
 
         let out_of_date = result
             .out_of_date
             .map(|date| {
-                DateTime::<FixedOffset>::from_utc(NaiveDateTime::from_timestamp(date, 0), cst)
-                    .format("%F")
-                    .to_string()
+                DateTime::<FixedOffset>::from_utc(
+                    NaiveDateTime::from_timestamp_opt(date, 0).unwrap(),
+                    cst,
+                )
+                .format("%F")
+                .to_string()
             })
             .unwrap_or_else(|| "no".to_string());
 
@@ -221,6 +221,7 @@ impl Display for AurResult {
 }
 
 impl AurResult {
+    #[instrument]
     pub fn optimize_result(&mut self, name: &str) {
         self.results.sort_by(|first, second| {
             let first_ratio = SequenceMatcher::new(name, &first.name).ratio();
@@ -242,15 +243,14 @@ impl AurResult {
     }
 }
 
+#[instrument(err)]
 pub async fn aur_query(name: &str) -> Result<AurResult, Error> {
-    let client = CLIENT.get_or_init(|| reqwest::Client::builder().gzip(true).build().unwrap());
-
     let mut url: Url = AUR_URL.parse().unwrap();
 
     url.query_pairs_mut()
         .extend_pairs(&[("v", "5"), ("type", "search"), ("arg", name)]);
 
-    let mut result = client
+    let mut result = CLIENT
         .request(Method::GET, url)
         .send()
         .await?

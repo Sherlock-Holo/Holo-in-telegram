@@ -1,19 +1,21 @@
 [package]
 name = "holo_in_telegram"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Sherlock Holo <sherlockya@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-teloxide = "0.3"
-tokio = { version = "0.2", features = ["macros"] }
-reqwest = { version = "0.10", default-features = false, features = ["json", "rustls-tls", "gzip"] }
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-anyhow = "1.0"
-difflib = "0.4"
+teloxide = { version = "0.11", default-features = false, features = ["ctrlc_handler", "rustls", "macros"] }
+tokio = { version = "1", features = ["macros", "rt"] }
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls", "gzip"] }
+serde_json = "1"
+serde = { version = "1", features = ["derive"] }
+anyhow = "1"
+difflib = "0"
 log = "0.4"
-pretty_env_logger = "0.4"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+tracing-log = "0.1"
 chrono = "0.4"

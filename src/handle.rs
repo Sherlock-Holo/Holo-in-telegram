@@ -1,36 +1,35 @@
 use std::env;
-use std::lazy::SyncOnceCell;
+use std::sync::LazyLock;
 
-use teloxide::prelude::UpdateWithCx;
-use teloxide::requests::{Request, ResponseResult};
+use teloxide::payloads::SendMessageSetters;
+use teloxide::requests::{Requester, ResponseResult};
 use teloxide::types::{Message, ParseMode};
+use teloxide::Bot;
 
 use crate::arch;
 use crate::command::Command;
 use crate::google;
 
-static GOOGLE_KEY_AND_CX: SyncOnceCell<Option<(String, String)>> = SyncOnceCell::new();
+static GOOGLE_KEY_AND_CX: LazyLock<Option<(String, String)>> = LazyLock::new(|| {
+    match (
+        env::var("HOLO_BOT_GOOGLE_KEY"),
+        env::var("HOLO_BOT_GOOGLE_CX"),
+    ) {
+        (Ok(google_key), Ok(google_cx)) => Some((google_key, google_cx)),
+
+        _ => None,
+    }
+});
 
 struct Answer {
     result: String,
     mode: ParseMode,
 }
 
-pub async fn handle(cx: UpdateWithCx<Message>, cmd: Command) -> ResponseResult<()> {
+pub async fn handle(bot: Bot, msg: Message, cmd: Command) -> ResponseResult<()> {
     let answer = match cmd {
         Command::Google(question) => {
-            let google_key_and_cx = GOOGLE_KEY_AND_CX.get_or_init(|| {
-                match (
-                    env::var("HOLO_BOT_GOOGLE_KEY"),
-                    env::var("HOLO_BOT_GOOGLE_CX"),
-                ) {
-                    (Ok(google_key), Ok(google_cx)) => Some((google_key, google_cx)),
-
-                    _ => None,
-                }
-            });
-
-            if let Some((google_key, google_cx)) = google_key_and_cx {
+            if let Some((google_key, google_cx)) = GOOGLE_KEY_AND_CX.as_ref() {
                 if question.is_empty() {
                     Answer {
                         result: "*/google* `question`".to_string(),
@@ -44,7 +43,7 @@ pub async fn handle(cx: UpdateWithCx<Message>, cmd: Command) -> ResponseResult<(
 
                     Answer {
                         result: answer,
-                        mode: ParseMode::HTML,
+                        mode: ParseMode::Html,
                     }
                 }
             } else {
@@ -103,19 +102,16 @@ pub async fn handle(cx: UpdateWithCx<Message>, cmd: Command) -> ResponseResult<(
 
                     Answer {
                         result: answer,
-                        mode: ParseMode::HTML,
+                        mode: ParseMode::Html,
                     }
                 }
             }
         }
     };
 
-    let message_id = cx.update.id;
-
-    cx.reply_to(answer.result)
+    bot.send_message(msg.chat.id, answer.result)
         .parse_mode(answer.mode)
-        .reply_to_message_id(message_id)
-        .send()
+        .reply_to_message_id(msg.id)
         .await?;
 
     Ok(())

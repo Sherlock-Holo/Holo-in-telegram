@@ -1,11 +1,11 @@
-use teloxide::utils::command::{BotCommand, ParseError};
+use teloxide::utils::command::{BotCommands, ParseError};
 
-#[derive(BotCommand, PartialEq, Debug, Eq, Clone)]
-#[command(rename = "lowercase")]
+#[derive(BotCommands, PartialEq, Debug, Eq, Clone)]
+#[command(rename_rule = "lowercase")]
 pub enum Command {
     #[command(
     description = "*/arch* `package [repo]`, repo: eg: `stable` , `testing`, `aur` or `core` , `extra`",
-    parse_with = "parse_arch"
+    parse_with = parse_arch
     )]
     Arch(Option<String>, Option<Vec<String>>),
 

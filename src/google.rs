@@ -1,21 +1,22 @@
 use std::fmt;
-use std::fmt::Display;
-use std::lazy::SyncOnceCell;
+use std::fmt::{Display, Formatter};
+use std::sync::OnceLock;
 
 use reqwest::{Client, Error, Url};
-use serde::export::Formatter;
 use serde::Deserialize;
+use tracing::instrument;
 
 const SEARCH_URL: &str = "https://www.googleapis.com/customsearch/v1";
 
-const UA: &str = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36";
+const UA: &str = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) \
+Chrome/66.0.3359.181 Safari/537.36";
 
-static CLIENT: SyncOnceCell<Client> = SyncOnceCell::new();
+static CLIENT: OnceLock<Client> = OnceLock::new();
 
 #[derive(Deserialize, Debug, Clone)]
 struct Item {
     pub title: String,
-    pub snippet: String,
+    // pub snippet: String,
     pub link: String,
 }
 
@@ -43,18 +44,14 @@ impl Display for GoogleResult {
     }
 }
 
+#[instrument(err)]
 pub async fn search(
     question: &str,
     google_key: &str,
     google_cx: &str,
 ) -> Result<GoogleResult, Error> {
-    let client = CLIENT.get_or_init(|| {
-        reqwest::Client::builder()
-            .gzip(true)
-            .user_agent(UA)
-            .build()
-            .unwrap()
-    });
+    let client =
+        CLIENT.get_or_init(|| Client::builder().gzip(true).user_agent(UA).build().unwrap());
 
     let mut url: Url = SEARCH_URL.parse().unwrap();
 
@@ -66,5 +63,5 @@ pub async fn search(
         ("q", question),
     ]);
 
-    Ok(client.get(url).send().await?.json().await?)
+    client.get(url).send().await?.json().await
 }
